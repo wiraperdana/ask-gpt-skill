@@ -1,20 +1,22 @@
 ---
 name: ask-gpt
-description: Minta jawaban atau second opinion dari GPT lewat Codex CLI yang sudah login di komputer yang sama, tanpa API key. Khusus Claude Code. Pakai saat pengguna mengetik "/ask-gpt <prompt>", atau meminta "tanya GPT", "tanya Codex", "minta pendapat GPT", "bandingkan dengan jawaban GPT". Claude meneruskan prompt yang dibawa saat skill dipanggil ke `codex exec`, lalu menyajikan jawaban Codex apa adanya, dipisahkan jelas dari pendapat Claude sendiri.
+description: Claude menjawab lebih dulu, lalu GPT lewat Codex CLI lokal (login ChatGPT, tanpa API key) memperhalus jawaban itu, yaitu gaya bahasa, pedagogi, dan cara berinteraksi, supaya lebih mudah dimengerti. Claude lalu me-review tanpa mengubah teks GPT. Khusus Claude Code. Pakai saat pengguna mengetik "/ask-gpt <prompt>", atau meminta jawaban Claude "diperhalus GPT", "dipoles GPT". Bila kata pertama prompt ":visually" atau "visually", skill juga membuat berkas HTML berisi visualisasi animasi interaktif dan contoh kasus. Untuk GPT yang menjawab lebih dulu, pakai /ask-gpt-first.
 ---
 
 # ask-gpt
 
-Skill ini membuat Claude Code bisa **bertanya ke Codex**, agent milik OpenAI, yang terpasang di komputer yang sama. Codex memakai login langganan ChatGPT pengguna, jadi tidak perlu `OPENAI_API_KEY`.
+Skill ini membuat jawaban melewati dua tangan. **Claude menjawab lebih dulu**, karena Claude melihat seluruh percakapan dan berkas project. **GPT, lewat Codex CLI** di komputer yang sama, lalu menulis ulang jawaban itu supaya lebih mudah dipahami. Codex memakai login langganan ChatGPT pengguna, jadi tidak perlu `OPENAI_API_KEY`.
 
-**Analogi.** Claude seperti dokter yang meminta konsultasi ke dokter spesialis lain di gedung yang sama. Claude mengirim surat rujukan (prompt). Spesialis memeriksa dan menulis jawabannya. Claude lalu menyerahkan jawaban itu ke pasien apa adanya, dan boleh menambahkan catatannya sendiri secara terpisah.
+**Analogi.** Claude seperti peneliti yang menulis laporan. GPT seperti editor yang membuat laporan itu enak dibaca orang awam tanpa mengubah datanya. Sesudah itu peneliti membaca hasil suntingan dan menulis catatan di kertas terpisah, tanpa mencoret naskah editor.
 
-## Kapan dipakai
-
-- Pengguna mengetik `/ask-gpt <prompt>`. Teks setelah nama skill adalah prompt yang diteruskan.
-- Pengguna meminta jawaban, review, atau second opinion dari GPT atau Codex.
+| Skill | Yang menjawab lebih dulu | Peran GPT |
+|---|---|---|
+| `/ask-gpt` | Claude | Memperhalus draf Claude |
+| `/ask-gpt-first` | GPT | Menjawab sendiri, sudah lengkap dengan gaya pengguna |
 
 Bila agent yang berjalan **adalah Codex sendiri**, jangan pakai skill ini. Jawab langsung.
+
+Aturan yang sama untuk kedua skill ada di `references/aturan-bersama.md`. **Baca berkas itu sebelum mulai.** Untuk mode visual, baca juga `references/visually.md`.
 
 ## Prasyarat
 
@@ -23,41 +25,22 @@ Bila agent yang berjalan **adalah Codex sendiri**, jangan pakai skill ini. Jawab
 
 ## Langkah
 
-1. **Ambil prompt.** Prompt adalah argumen yang dibawa saat skill dipanggil. Teruskan **sebagai adanya**: jangan diringkas, diterjemahkan, atau diubah maknanya.
-   - Bila argumennya kosong, tanyakan ke pengguna apa yang ingin ditanyakan.
-   - Bila prompt merujuk konteks percakapan ("kode tadi", "berkas ini"), Codex tidak melihat percakapan Claude. Tambahkan konteks yang dibutuhkan di bawah prompt asli dengan judul `KONTEKS DARI CLAUDE:`, misalnya path berkas atau potongan kode. Sebut ke pengguna bahwa konteks itu ditambahkan.
-   - **Bawa aturan gaya pengguna.** Codex otomatis membaca `AGENTS.md` di folder kerjanya, tetapi tidak membaca berkas instruksi Claude seperti `~/.claude/CLAUDE.md`. Folder kerja lain lewat `--cd` juga bisa tidak punya `AGENTS.md` yang sama. Karena itu, bila berkas instruksi yang dimuat Claude berisi aturan gaya atau interaksi, ringkas aturan itu ke blok `ATURAN GAYA PENGGUNA:` di bawah prompt. Contohnya bahasa, larangan tanda baca tertentu, kedalaman penjelasan, dan format keputusan. Pembuka standar menyuruh Codex mematuhi blok ini.
-     - Isinya **hanya aturan**, paling banyak sekitar 15 butir pendek. Jangan sertakan nama, profil, kredensial, data klien, isi project, atau detail pribadi lain, karena prompt terkirim ke OpenAI.
-     - Bila tidak ada aturan gaya, lewati blok ini. Bila ada, sebut ke pengguna bahwa blok itu ditambahkan.
-2. **Tentukan folder kerja.** Default folder kerja saat ini, supaya Codex bisa membaca berkas project. Pakai `--cd <dir>` bila pertanyaannya tentang folder lain.
-3. **Jalankan.** Tulis prompt ke berkas sementara, lalu kirim lewat stdin:
+1. **Baca argumen.** Pisahkan penanda `:visually` dari prompt (aturan bersama bagian A).
+2. **Claude menulis draf jawaban.** Jawab pertanyaan pengguna selengkap mungkin, dengan seluruh konteks percakapan dan berkas yang Claude punya. Fokus pada isi yang benar: fakta, angka, kode, path, dan sitasi. Draf ini **belum ditampilkan** ke pengguna.
+3. **Susun input untuk GPT** di berkas sementara, dengan tiga bagian berurutan:
+   - `PERTANYAAN PENGGUNA:` berisi kata-kata pengguna apa adanya.
+   - `DRAF CLAUDE:` berisi draf dari langkah 2, utuh.
+   - Bila perlu, `KONTEKS DARI CLAUDE:` dan `ATURAN GAYA PENGGUNA:`, mengikuti aturan bersama bagian B.
+4. **Jalankan dengan `--polish`:**
 
    ```bash
-   ~/.claude/skills/ask-gpt/scripts/ask.sh [opsi] < /path/prompt.txt
+   ~/.claude/skills/ask-gpt/scripts/ask.sh --polish [opsi] < /path/input.txt
    ```
 
-   Pakai heredoc berpetik (`<<'EOF'`) bila menulis prompt langsung di shell, supaya `$` dan backtick tidak diproses. Codex bisa butuh 30 detik sampai beberapa menit, jadi beri timeout Bash yang longgar (misalnya 600000 ms).
-4. **Sajikan jawaban.** Tampilkan jawaban Codex di bawah judul **Jawaban GPT (Codex)**, utuh dan tanpa disunting. Bila Claude punya catatan, misalnya setuju, tidak setuju, atau menemukan kekeliruan, tulis terpisah di bawah judul **Catatan Claude**. Jangan mencampur keduanya.
-   - Teks Claude sendiri, termasuk **Catatan Claude**, tetap mengikuti seluruh aturan gaya pengguna.
-   - Bila jawaban Codex melanggar aturan gaya pengguna, jangan menyuntingnya. Sebut pelanggarannya singkat di **Catatan Claude**, supaya pengguna tahu teks itu bukan hasil aturannya.
-   - Bila Codex menulis bagian **Keputusan untuk pengguna**, bawa keputusan itu ke format keputusan pengguna di bagian akhir balasan Claude, misalnya ID keputusan bila pengguna memakainya. Jangan memutuskannya atas nama pengguna. Bila Codex sudah memberi ID sendiri, abaikan ID itu dan beri ID dari penomoran sesi Claude, karena Codex tidak tahu ID mana yang sudah terpakai.
-5. **Simpan ID sesi.** Skrip mencetak ID sesi Codex ke stderr. Bila pengguna bertanya lanjutan untuk topik yang sama, pakai `--resume <id>` supaya Codex ingat percakapan sebelumnya.
-
-## Opsi `ask.sh`
-
-| Opsi | Fungsi |
-|---|---|
-| `--cd <dir>` | Folder kerja Codex. Default folder saat ini. |
-| `--model <m>` | Pilih model Codex. Default mengikuti `~/.codex/config.toml`. |
-| `--write` | Izinkan Codex mengubah berkas di folder kerja (sandbox `workspace-write`). Default `read-only`. Pakai **hanya** bila pengguna meminta Codex mengubah berkas. |
-| `--resume <id\|last>` | Lanjutkan sesi Codex sebelumnya. |
-| `--image <file>` | Lampirkan gambar. Boleh berulang. |
-| `--raw` | Kirim prompt tanpa pembuka standar. Pembuka standar memberi tahu Codex bahwa ia sedang dimintai second opinion, menyuruhnya mematuhi aturan gaya pengguna, dan memintanya mendaftar keputusan terbuka alih-alih berasumsi diam-diam. Tanpa pembuka, ketiganya hilang. |
-| `--dry-run` | Cetak perintah dan prompt tanpa memanggil Codex. |
-
-## Batasan yang wajib disampaikan bila relevan
-
-- Prompt dan berkas yang dibaca Codex terkirim ke OpenAI. Jangan teruskan data rahasia, kredensial, atau data berlisensi tanpa izin pengguna.
-- Setiap panggilan memakai kuota langganan ChatGPT pengguna.
-- Codex tidak melihat percakapan Claude, kecuali yang ditulis di prompt.
-- Jawaban Codex bisa keliru, sama seperti jawaban Claude. Skill ini memberi pendapat kedua, bukan kebenaran akhir.
+   Pembuka mode `--polish` menyuruh GPT mempertahankan substansi teknis dan menambah penjelasan, analogi, serta definisi istilah. Bila GPT menilai ada yang salah di draf, ia tidak memperbaikinya diam-diam. Ia menulisnya di bagian **Catatan GPT untuk Claude**.
+5. **Sajikan hasil** mengikuti aturan bersama bagian D. Jawaban GPT tampil utuh di bawah **Jawaban GPT (Codex)**. Draf Claude tidak ditampilkan, kecuali pengguna memintanya.
+6. **Review Claude** di **Catatan Claude**, tanpa mengubah teks GPT. Periksa khususnya:
+   - apakah ada fakta, angka, kode, atau sitasi dari draf yang berubah atau hilang saat diperhalus;
+   - tanggapan Claude atas **Catatan GPT untuk Claude**, bila ada: setuju dan mengoreksi di catatan, atau tidak setuju beserta alasannya.
+7. **Mode visual**, bila aktif: buat HTML dari jawaban akhir GPT, mengikuti `references/visually.md`.
+8. **Simpan ID sesi.** Bila pengguna bertanya lanjutan untuk topik yang sama, Claude menulis draf baru lalu memakai `--polish --resume <id>`.

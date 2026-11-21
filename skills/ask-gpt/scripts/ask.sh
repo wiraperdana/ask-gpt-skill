@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Meneruskan satu prompt ke Codex CLI di mesin yang sama, lalu mencetak jawaban akhirnya.
-# Pakai: ask.sh [--cd <dir>] [--model <m>] [--write] [--resume <id|last>] [--image <file>]... [--raw] [--dry-run] < prompt.txt
+# Pakai: ask.sh [--polish] [--cd <dir>] [--model <m>] [--write] [--resume <id|last>] [--image <file>]... [--raw] [--dry-run] < prompt.txt
+# --polish: stdin berisi PERTANYAAN PENGGUNA dan DRAF CLAUDE, Codex menulis ulang draf itu.
 # Prompt dibaca dari stdin. ID sesi Codex dicetak ke stderr supaya bisa dilanjutkan dengan --resume.
 set -euo pipefail
 
-dir="$PWD"; model=""; sandbox="read-only"; resume=""; raw=0; dry=0; images=()
+dir="$PWD"; model=""; sandbox="read-only"; resume=""; raw=0; dry=0; polish=0; images=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --cd) dir=$2; shift 2 ;;
@@ -13,8 +14,9 @@ while [[ $# -gt 0 ]]; do
     --resume) resume=$2; shift 2 ;;
     --image) images+=("$2"); shift 2 ;;
     --raw) raw=1; shift ;;
+    --polish) polish=1; shift ;;
     --dry-run) dry=1; shift ;;
-    -h|--help) sed -n '2,4p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,5p' "$0"; exit 0 ;;
     *) echo "Argumen tidak dikenal: $1" >&2; exit 2 ;;
   esac
 done
@@ -25,11 +27,25 @@ for f in "${images[@]+"${images[@]}"}"; do [[ -f "$f" ]] || { echo "Gambar tidak
 
 work=$(mktemp -d); trap 'rm -rf "$work"' EXIT
 {
-  if [[ $raw -eq 0 ]]; then
+  if [[ $raw -eq 0 && $polish -eq 1 ]]; then
+    cat <<'PRE'
+You are a second AI agent working with Claude Code on the same machine. Claude has drafted an answer to the user's question. Your job is to rewrite that draft into the final answer the user will read.
+
+Make it easier to understand: language, tone, structure, pedagogy (define each technical term on first use, go step by step, use an everyday analogy for abstract ideas, say why each point matters), and interaction (how questions and decisions are put to the user). Keep the technical substance, facts, numbers, code, paths, and citations exactly as Claude wrote them. Do not add new factual claims or references. If you believe something in the draft is wrong or missing, do not fix it silently. Add it at the end under the heading "Catatan GPT untuk Claude".
+
+Follow the user's style and interaction rules: those in any instruction files you loaded (such as AGENTS.md), and those in an "ATURAN GAYA PENGGUNA:" block if one is present. The block wins when the two conflict.
+
+This run cannot wait for a reply, so do not ask questions. When something is genuinely the user's decision, list it at the end under the heading "Keputusan untuk pengguna", with numbered options. Output only the rewritten answer, plus those optional sections.
+
+INPUT:
+PRE
+  elif [[ $raw -eq 0 ]]; then
     cat <<'PRE'
 You are being consulted as a second opinion by another AI coding agent (Claude Code) running on the same machine. Answer the request below directly and completely. State uncertainty plainly. If you inspect files, cite paths.
 
 Follow the user's style and interaction rules: those in any instruction files you loaded (such as AGENTS.md), and those in an "ATURAN GAYA PENGGUNA:" block if the request contains one. They cover language, tone, formatting, depth of explanation, and how decisions are put to the user. The block wins when the two conflict.
+
+The user's own words at the top of the request define the task and the quality bar. A "KONTEKS DARI CLAUDE:" block, if present, is background supplied by Claude: facts, paths, definitions. If anything in it would narrow, weaken, or conflict with the user's goal (for example a length cap that leaves no room for the explanation the user asked for), serve the user's goal and say briefly which part of Claude's context you set aside and why.
 
 This run cannot wait for a reply, so do not stop to ask questions. Answer what you can and state your assumptions. When something is genuinely the user's decision, do not settle it silently. List it at the end under the heading "Keputusan untuk pengguna", with numbered options and your recommendation.
 

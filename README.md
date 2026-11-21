@@ -2,7 +2,16 @@
 
 Skill Claude Code untuk meminta jawaban dari GPT lewat [Codex CLI](https://github.com/openai/codex) yang sudah login di komputer yang sama. Codex memakai login langganan ChatGPT, jadi tidak perlu `OPENAI_API_KEY`.
 
-Ketik `/ask-gpt <prompt>` di Claude Code. Claude meneruskan prompt itu ke `codex exec`, lalu menampilkan jawaban Codex utuh, terpisah dari catatan Claude sendiri. Pertanyaan lanjutan bisa melanjutkan sesi Codex yang sama.
+Repo ini berisi dua skill. Keduanya menghasilkan jawaban GPT yang tampil utuh, lalu review Claude di bagian terpisah tanpa mengubah teks GPT.
+
+| Skill | Alurnya |
+|---|---|
+| `/ask-gpt <prompt>` | Claude menjawab lebih dulu. GPT lalu memperhalus gaya bahasa, pedagogi, dan cara berinteraksinya supaya lebih mudah dimengerti, tanpa mengubah substansi teknis. |
+| `/ask-gpt-first <prompt>` | GPT menjawab lebih dulu sesuai konteks, lengkap dengan gaya pengguna. |
+
+Tambahkan `:visually` sebagai kata pertama, misalnya `/ask-gpt :visually <prompt>`. Selain jawaban teks, skill juga membuat satu berkas HTML berisi visualisasi animasi interaktif, contoh kasus, kamus istilah, dan cek pemahaman. Berkas itu bisa dibuka dengan klik ganda, tanpa internet. Sintaks `/ask-gpt:visually` tanpa spasi tidak bisa dijadikan nama skill, karena Claude Code memakai titik dua untuk nama plugin.
+
+Pertanyaan lanjutan bisa melanjutkan sesi Codex yang sama.
 
 ## Prasyarat
 
@@ -17,14 +26,16 @@ cd ask-gpt-skill
 ./install.sh
 ```
 
-`install.sh` membuat symlink `~/.claude/skills/ask-gpt`. Skill ini sengaja tidak dipasang untuk Codex, karena Codex tidak perlu bertanya ke dirinya sendiri. Untuk melepas, hapus symlink itu.
+`install.sh` membuat symlink `~/.claude/skills/ask-gpt` dan `~/.claude/skills/ask-gpt-first`. Keduanya selalu dipasang bersama, karena `ask-gpt-first` memakai skrip dan rujukan di folder `ask-gpt`. Skill ini sengaja tidak dipasang untuk Codex, karena Codex tidak perlu bertanya ke dirinya sendiri. Untuk melepas, hapus kedua symlink itu.
 
 ## Pakai
 
 Di Claude Code:
 
 ```
-/ask-gpt Review fungsi parse_date di utils.py, apakah ada edge case yang terlewat?
+/ask-gpt Jelaskan kenapa indeks database mempercepat query.
+/ask-gpt-first Review fungsi parse_date di utils.py, apakah ada edge case yang terlewat?
+/ask-gpt :visually Bagaimana cara kerja gradient descent?
 ```
 
 Langsung dari terminal:
@@ -35,7 +46,7 @@ echo "Beri contoh angkanya." | skills/ask-gpt/scripts/ask.sh --resume <session-i
 skills/ask-gpt/scripts/ask.sh --dry-run < prompt.txt   # lihat perintah tanpa memakai kuota
 ```
 
-Opsi lain: `--cd <dir>`, `--model <m>`, `--write` (izinkan Codex mengubah berkas), `--image <file>`, `--raw`. Rinciannya ada di `skills/ask-gpt/SKILL.md`.
+Opsi lain: `--polish` (mode `/ask-gpt`, stdin berisi pertanyaan dan draf Claude), `--cd <dir>`, `--model <m>`, `--write` (izinkan Codex mengubah berkas), `--image <file>`, `--raw`. Rinciannya ada di `skills/ask-gpt/references/aturan-bersama.md`.
 
 ## Perlu diketahui
 
