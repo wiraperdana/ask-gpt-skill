@@ -27,7 +27,11 @@ work=$(mktemp -d); trap 'rm -rf "$work"' EXIT
 {
   if [[ $raw -eq 0 ]]; then
     cat <<'PRE'
-You are being consulted as a second opinion by another AI coding agent (Claude Code) running on the same machine. Answer the request below directly and completely. State uncertainty plainly. If you inspect files, cite paths. Do not ask follow-up questions; make reasonable assumptions and say what they are.
+You are being consulted as a second opinion by another AI coding agent (Claude Code) running on the same machine. Answer the request below directly and completely. State uncertainty plainly. If you inspect files, cite paths.
+
+Follow the user's style and interaction rules: those in any instruction files you loaded (such as AGENTS.md), and those in an "ATURAN GAYA PENGGUNA:" block if the request contains one. They cover language, tone, formatting, depth of explanation, and how decisions are put to the user. The block wins when the two conflict.
+
+This run cannot wait for a reply, so do not stop to ask questions. Answer what you can and state your assumptions. When something is genuinely the user's decision, do not settle it silently. List it at the end under the heading "Keputusan untuk pengguna", with numbered options and your recommendation.
 
 REQUEST:
 PRE

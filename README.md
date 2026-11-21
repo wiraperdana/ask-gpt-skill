@@ -39,6 +39,7 @@ Opsi lain: `--cd <dir>`, `--model <m>`, `--write` (izinkan Codex mengubah berkas
 
 ## Perlu diketahui
 
+- Gaya dan cara berinteraksi Anda ikut terbawa. Codex membaca `AGENTS.md` di folder kerjanya, dan Claude menambahkan ringkasan aturan gaya dari berkas instruksi Claude Anda, tanpa data pribadi. Keputusan yang mestinya Anda ambil didaftar di akhir jawaban, tidak diputuskan diam-diam.
 - Default sandbox Codex `read-only`: ia boleh membaca berkas di folder kerja, tetapi tidak mengubahnya.
 - Prompt dan berkas yang dibaca Codex terkirim ke OpenAI. Jangan teruskan data rahasia tanpa izin.
 - Setiap panggilan memakai kuota langganan ChatGPT.

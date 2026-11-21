@@ -26,6 +26,9 @@ Bila agent yang berjalan **adalah Codex sendiri**, jangan pakai skill ini. Jawab
 1. **Ambil prompt.** Prompt adalah argumen yang dibawa saat skill dipanggil. Teruskan **sebagai adanya**: jangan diringkas, diterjemahkan, atau diubah maknanya.
    - Bila argumennya kosong, tanyakan ke pengguna apa yang ingin ditanyakan.
    - Bila prompt merujuk konteks percakapan ("kode tadi", "berkas ini"), Codex tidak melihat percakapan Claude. Tambahkan konteks yang dibutuhkan di bawah prompt asli dengan judul `KONTEKS DARI CLAUDE:`, misalnya path berkas atau potongan kode. Sebut ke pengguna bahwa konteks itu ditambahkan.
+   - **Bawa aturan gaya pengguna.** Codex otomatis membaca `AGENTS.md` di folder kerjanya, tetapi tidak membaca berkas instruksi Claude seperti `~/.claude/CLAUDE.md`. Folder kerja lain lewat `--cd` juga bisa tidak punya `AGENTS.md` yang sama. Karena itu, bila berkas instruksi yang dimuat Claude berisi aturan gaya atau interaksi, ringkas aturan itu ke blok `ATURAN GAYA PENGGUNA:` di bawah prompt. Contohnya bahasa, larangan tanda baca tertentu, kedalaman penjelasan, dan format keputusan. Pembuka standar menyuruh Codex mematuhi blok ini.
+     - Isinya **hanya aturan**, paling banyak sekitar 15 butir pendek. Jangan sertakan nama, profil, kredensial, data klien, isi project, atau detail pribadi lain, karena prompt terkirim ke OpenAI.
+     - Bila tidak ada aturan gaya, lewati blok ini. Bila ada, sebut ke pengguna bahwa blok itu ditambahkan.
 2. **Tentukan folder kerja.** Default folder kerja saat ini, supaya Codex bisa membaca berkas project. Pakai `--cd <dir>` bila pertanyaannya tentang folder lain.
 3. **Jalankan.** Tulis prompt ke berkas sementara, lalu kirim lewat stdin:
 
@@ -35,6 +38,9 @@ Bila agent yang berjalan **adalah Codex sendiri**, jangan pakai skill ini. Jawab
 
    Pakai heredoc berpetik (`<<'EOF'`) bila menulis prompt langsung di shell, supaya `$` dan backtick tidak diproses. Codex bisa butuh 30 detik sampai beberapa menit, jadi beri timeout Bash yang longgar (misalnya 600000 ms).
 4. **Sajikan jawaban.** Tampilkan jawaban Codex di bawah judul **Jawaban GPT (Codex)**, utuh dan tanpa disunting. Bila Claude punya catatan, misalnya setuju, tidak setuju, atau menemukan kekeliruan, tulis terpisah di bawah judul **Catatan Claude**. Jangan mencampur keduanya.
+   - Teks Claude sendiri, termasuk **Catatan Claude**, tetap mengikuti seluruh aturan gaya pengguna.
+   - Bila jawaban Codex melanggar aturan gaya pengguna, jangan menyuntingnya. Sebut pelanggarannya singkat di **Catatan Claude**, supaya pengguna tahu teks itu bukan hasil aturannya.
+   - Bila Codex menulis bagian **Keputusan untuk pengguna**, bawa keputusan itu ke format keputusan pengguna di bagian akhir balasan Claude, misalnya ID keputusan bila pengguna memakainya. Jangan memutuskannya atas nama pengguna. Bila Codex sudah memberi ID sendiri, abaikan ID itu dan beri ID dari penomoran sesi Claude, karena Codex tidak tahu ID mana yang sudah terpakai.
 5. **Simpan ID sesi.** Skrip mencetak ID sesi Codex ke stderr. Bila pengguna bertanya lanjutan untuk topik yang sama, pakai `--resume <id>` supaya Codex ingat percakapan sebelumnya.
 
 ## Opsi `ask.sh`
@@ -46,7 +52,7 @@ Bila agent yang berjalan **adalah Codex sendiri**, jangan pakai skill ini. Jawab
 | `--write` | Izinkan Codex mengubah berkas di folder kerja (sandbox `workspace-write`). Default `read-only`. Pakai **hanya** bila pengguna meminta Codex mengubah berkas. |
 | `--resume <id\|last>` | Lanjutkan sesi Codex sebelumnya. |
 | `--image <file>` | Lampirkan gambar. Boleh berulang. |
-| `--raw` | Kirim prompt tanpa pembuka standar. Pembuka standar memberi tahu Codex bahwa ia sedang dimintai second opinion. |
+| `--raw` | Kirim prompt tanpa pembuka standar. Pembuka standar memberi tahu Codex bahwa ia sedang dimintai second opinion, menyuruhnya mematuhi aturan gaya pengguna, dan memintanya mendaftar keputusan terbuka alih-alih berasumsi diam-diam. Tanpa pembuka, ketiganya hilang. |
 | `--dry-run` | Cetak perintah dan prompt tanpa memanggil Codex. |
 
 ## Batasan yang wajib disampaikan bila relevan
