@@ -22,6 +22,15 @@ Argumen skill adalah teks sesudah nama skill.
    - Bila tidak ada aturan gaya, lewati blok ini.
 4. **Laporkan setiap tambahan.** Di balasannya, Claude menyebut singkat semua yang ia tambahkan di luar kata-kata pengguna, yaitu konteks, aturan gaya, dan batasan teknis. Dengan begitu pengguna bisa menilai apakah tambahan itu ikut membentuk jawaban Codex.
 
+## B2. Aturan menulis yang selalu berlaku
+
+Aturan ini berlaku untuk draf Claude, jawaban GPT, Catatan Claude, dan HTML mode visual. Pembuka standar `ask.sh` sudah memuatnya untuk GPT.
+
+1. **Lebih dari tiga butir dalam satu kalimat ditulis sebagai list.** Kalimat seperti "langkahnya parsing, encoding, scaling, dan imputasi" dipecah jadi daftar berbutir. Alasannya, mata pembaca bisa menghitung dan menandai butir satu per satu.
+2. **Analogi diambil dari kejadian sehari-hari yang paling umum dialami orang awam.** Contohnya memasak, belanja, antre, naik kendaraan umum, atau sekolah. Analogi harus lebih sederhana dari topiknya dan berasal dari luar bidang topik itu.
+   - Topik keamanan siber tidak dianalogikan dengan "petugas keamanan". Itu masih bidang yang sama, jadi pembaca awam tidak mendapat pegangan baru.
+   - Sesudah analogi, petakan setiap unsurnya kembali ke istilah teknis. Contoh: "resep = pipeline, bahan = feature, mencicipi = validasi".
+
 ## C. Menjalankan `ask.sh`
 
 Tulis prompt ke berkas sementara, lalu kirim lewat stdin:

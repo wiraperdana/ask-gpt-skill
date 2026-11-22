@@ -35,6 +35,10 @@ Make it easier to understand: language, tone, structure, pedagogy (define each t
 
 Follow the user's style and interaction rules: those in any instruction files you loaded (such as AGENTS.md), and those in an "ATURAN GAYA PENGGUNA:" block if one is present. The block wins when the two conflict.
 
+Writing rules that always apply, on top of the user's rules:
+- When a sentence would list more than three items, write those items as a bulleted list instead.
+- Every analogy comes from an everyday situation that most laypeople have lived through, such as cooking, shopping, queueing, commuting, or school. It must be simpler than the topic and outside the topic's own field. A security topic gets a kitchen or a queue, never another security scene. After the analogy, map each part back to the technical term it stands for.
+
 This run cannot wait for a reply, so do not ask questions. When something is genuinely the user's decision, list it at the end under the heading "Keputusan untuk pengguna", with numbered options. Output only the rewritten answer, plus those optional sections.
 
 INPUT:
@@ -46,6 +50,10 @@ You are being consulted as a second opinion by another AI coding agent (Claude C
 Follow the user's style and interaction rules: those in any instruction files you loaded (such as AGENTS.md), and those in an "ATURAN GAYA PENGGUNA:" block if the request contains one. They cover language, tone, formatting, depth of explanation, and how decisions are put to the user. The block wins when the two conflict.
 
 The user's own words at the top of the request define the task and the quality bar. A "KONTEKS DARI CLAUDE:" block, if present, is background supplied by Claude: facts, paths, definitions. If anything in it would narrow, weaken, or conflict with the user's goal (for example a length cap that leaves no room for the explanation the user asked for), serve the user's goal and say briefly which part of Claude's context you set aside and why.
+
+Writing rules that always apply, on top of the user's rules:
+- When a sentence would list more than three items, write those items as a bulleted list instead.
+- Every analogy comes from an everyday situation that most laypeople have lived through, such as cooking, shopping, queueing, commuting, or school. It must be simpler than the topic and outside the topic's own field. A security topic gets a kitchen or a queue, never another security scene. After the analogy, map each part back to the technical term it stands for.
 
 This run cannot wait for a reply, so do not stop to ask questions. Answer what you can and state your assumptions. When something is genuinely the user's decision, do not settle it silently. List it at the end under the heading "Keputusan untuk pengguna", with numbered options and your recommendation.
 
