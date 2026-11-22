@@ -76,8 +76,10 @@ Bagian ini lahir dari kesalahan nyata. Label teks pernah ditaruh di atas bar ber
 
 ## Uji sebelum melapor
 
-1. Buka halaman di browser lokal bila tersedia, misalnya lewat tool browser atau headless Chrome. Periksa bahwa tidak ada error di console dan setiap kontrol interaktif benar-benar mengubah tampilan.
-   - Ambil screenshot di tiga lebar, yaitu 390, 768, dan 1280 px, dalam mode terang dan gelap. Lihat sendiri gambarnya.
-   - Periksa daftar larangan tumpang tindih satu per satu. Periksa juga tidak ada scroll ke samping (`document.documentElement.scrollWidth` sama dengan lebar jendela).
-2. Bila browser tidak tersedia, minimal jalankan pemeriksaan sintaks JavaScript (`node --check` pada skrip yang diekstrak). Laporkan bahwa uji visual belum dijalankan.
+1. **Uji visual dengan headless browser.** Headless browser adalah browser tanpa jendela yang bisa dijalankan dari terminal. Pilihan default skill ini [Obscura](https://github.com/h4ckf0r0day/obscura), karena ringan (sekitar 70 MB) dan tidak butuh Chromium. Bila `obscura` belum ada di PATH, sarankan pengguna memasangnya dari halaman Releases. Tool browser lain yang sudah tersedia juga boleh dipakai.
+   - **Tampilan atas, satu langkah:** `obscura fetch "file:///path/halaman.html" -s atas.png`. Hasilnya satu layar 1280 x 720 dalam mode terang. Tambahkan `--eval "<js>"` untuk memeriksa DOM, misalnya jumlah elemen.
+   - **Enam screenshot penuh:** jalankan `obscura serve -p 9333 --allow-file-access` di latar belakang, lalu `node ~/.claude/skills/ask-gpt/scripts/shot.mjs halaman.html <folder-out>`. Butuh Node 22 ke atas. Skrip memotret lebar 390, 768, dan 1280 px, masing-masing dalam mode terang dan gelap. Ia juga melaporkan scroll ke samping (`scrollWidth` lebih besar dari lebar jendela). Hentikan `obscura serve` sesudahnya.
+   - Lihat sendiri gambarnya. Periksa daftar larangan tumpang tindih satu per satu, terutama tombol yang teksnya patah jadi dua baris.
+   - **Batas Obscura:** renderer-nya belum menggambar `input type=range` seperti browser biasa, jadi slider tampil sebagai kotak polos. Itu bukan cacat halaman. Ia juga tidak mengeksekusi klik, jadi kontrol interaktif diuji lewat `--eval` atau DOM tiruan, bukan dari gambar.
+2. Bila tidak ada headless browser sama sekali, minimal jalankan pemeriksaan sintaks JavaScript (`node --check` pada skrip yang diekstrak). Laporkan bahwa uji visual belum dijalankan.
 3. Laporkan path absolut berkas. Halaman ini tidak dipublikasikan ke mana pun, kecuali pengguna memintanya.
