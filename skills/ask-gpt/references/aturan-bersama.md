@@ -30,6 +30,10 @@ Aturan ini berlaku untuk draf Claude, jawaban GPT, Catatan Claude, dan HTML mode
 2. **Analogi diambil dari kejadian sehari-hari yang paling umum dialami orang awam.** Contohnya memasak, belanja, antre, naik kendaraan umum, atau sekolah. Analogi harus lebih sederhana dari topiknya dan berasal dari luar bidang topik itu.
    - Topik keamanan siber tidak dianalogikan dengan "petugas keamanan". Itu masih bidang yang sama, jadi pembaca awam tidak mendapat pegangan baru.
    - Sesudah analogi, petakan setiap unsurnya kembali ke istilah teknis. Contoh: "resep = pipeline, bahan = feature, mencicipi = validasi".
+3. **Judul, label, dan kalimat ditulis seperti ucapan manusia, dengan subjek dan kata kerja.** Hindari pola khas AI: frasa benda, lalu koma atau titik dua, lalu potongan keterangan.
+   - "Alur 8 langkah, mengikuti satu laporan" menjadi "Satu laporan melewati 8 langkah".
+   - "Recency weight: data baru lebih didengar" menjadi "Data baru diberi bobot lebih besar".
+   - Ujinya: apakah kalimat itu wajar diucapkan saat ngobrol? Kalau tidak, tulis ulang. Alasannya, pola terpotong itu memaksa pembaca menyusun sendiri hubungan antarbagian, dan langsung terasa sebagai tulisan mesin.
 
 ## C. Menjalankan `ask.sh`
 
