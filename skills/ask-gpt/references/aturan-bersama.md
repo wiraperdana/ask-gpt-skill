@@ -34,6 +34,11 @@ Aturan ini berlaku untuk draf Claude, jawaban GPT, Catatan Claude, dan HTML mode
    - "Alur 8 langkah, mengikuti satu laporan" menjadi "Satu laporan melewati 8 langkah".
    - "Recency weight: data baru lebih didengar" menjadi "Data baru diberi bobot lebih besar".
    - Ujinya: apakah kalimat itu wajar diucapkan saat ngobrol? Kalau tidak, tulis ulang. Alasannya, pola terpotong itu memaksa pembaca menyusun sendiri hubungan antarbagian, dan langsung terasa sebagai tulisan mesin.
+4. **Satu analogi utama untuk seluruh jawaban, lalu dipertahankan.** Konsep berikutnya dijelaskan sebagai bagian lain dari dunia analogi yang sama, bukan analogi baru.
+   - Contoh: bila analogi utamanya antre berobat di puskesmas, OOF dijelaskan lewat perawat di puskesmas itu, bukan lewat guru dan soal ujian.
+   - Analogi kedua hanya boleh dipakai bila konsepnya tidak punya padanan di dunia analogi utama, dan wajib ditandai, misalnya "di luar puskesmas, bayangkan...".
+   - Pertanyaan lanjutan pada topik yang sama memakai lagi analogi utama dari jawaban atau HTML sebelumnya. Sebut analogi itu di `KONTEKS DARI CLAUDE:` supaya GPT ikut memakainya.
+   - Alasannya, setiap analogi baru memaksa pembaca membangun peta baru, dan pemetaan dari analogi sebelumnya jadi sia-sia.
 
 ## C. Menjalankan `ask.sh`
 
